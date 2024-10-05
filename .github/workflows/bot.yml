@@ -1,0 +1,53 @@
+# .github/workflows/bot.yml
+
+name: Bot Hosting Workflow
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js or Python
+      run: |
+        if [ -f "your-bot-file.js" ]; then
+          echo "Setting up Node.js"
+          npm install
+        elif [ -f "your-bot-file.py" ]; then
+          echo "Setting up Python"
+          pip install -r requirements.txt
+        else
+          echo "No bot file found."
+          exit 1
+        fi
+
+    - name: Run the bot
+      run: |
+        if [ -f "your-bot-file.js" ]; then
+          node your-bot-file.js
+        elif [ -f "your-bot-file.py" ]; then
+          python your-bot-file.py
+        fi
+      env:
+        # Optional secret variables, if provided
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        OTHER_SECRET: ${{ secrets.OTHER_SECRET }}
+
+  force_restart:
+    if: failure()  # Only run if the previous job fails
+    runs-on: ubuntu-latest
+    steps:
+    - name: Force Restart Bot
+      run: |
+        echo "Forcing restart of the bot."
+        # Implement any logic here to reset the bot or notify the user.
+        
